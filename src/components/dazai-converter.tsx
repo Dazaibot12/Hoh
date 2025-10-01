@@ -130,46 +130,36 @@ export function DazaiConverter({
     return () => stopLiveUpdates();
   }, [stopLiveUpdates]);
   
-  const { idrResult, tonResult } = useMemo(() => {
-    const inputAmount = parseFloat(activeInput === 'ton' ? tonAmount : idrAmount) || 0;
-    if (inputAmount === 0 || tonPrice.idr <= 0 || !settingsLoaded) {
-      return { idrResult: '0', tonResult: '0' };
-    }
-
-    const harga_dasar_per_ton = tonPrice.idr;
-    const laba_per_ton_fixed =
-      settings.profitMode === 'fixed'
-        ? settings.profitValue
-        : (settings.profitValue / 100) * harga_dasar_per_ton;
-
-    const harga_jual_per_ton = harga_dasar_per_ton + laba_per_ton_fixed; // IDR -> TON rate
-    const harga_beli_per_ton = harga_dasar_per_ton - laba_per_ton_fixed; // TON -> IDR rate
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
 
     if (activeInput === 'ton') {
-      const newIdrAmount = inputAmount * harga_beli_per_ton;
-      return { idrResult: newIdrAmount.toFixed(0), tonResult: tonAmount };
-    } else { // activeInput is 'idr'
-      const newTonAmount = harga_jual_per_ton > 0 ? inputAmount / harga_jual_per_ton : 0;
-      const formattedTon = newTonAmount > 0 ? newTonAmount.toFixed(8).replace(/\.?0+$/, "") : '0';
-      return { idrResult: idrAmount, tonResult: formattedTon };
-    }
-  }, [tonAmount, idrAmount, activeInput, tonPrice.idr, settings, settingsLoaded]);
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const setter = activeInput === 'ton' ? setTonAmount : setIdrAmount;
-
-    // Allow empty string, numbers, and a single dot
-    if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
-        setter(value);
+      // Allow only numbers and a single dot for TON
+      if (rawValue === "" || /^[0-9]*\.?[0-9]*$/.test(rawValue)) {
+        setTonAmount(rawValue);
+      }
+    } else { // activeInput === 'idr'
+      // For IDR, format with separators but store raw value for calculation
+      const numericValue = rawValue.replace(/[^0-9]/g, '');
+      if (numericValue === "") {
+        setIdrAmount("");
+        return;
+      }
+      const parsed = parseInt(numericValue, 10);
+      if (!isNaN(parsed)) {
+          setIdrAmount(parsed.toLocaleString(lang === 'id' ? 'id-ID' : 'en-US'));
+      } else {
+          setIdrAmount("");
+      }
     }
   };
 
   useEffect(() => {
-    const value = activeInput === 'ton' ? tonAmount : idrAmount;
     if (!settingsLoaded || !tonPrice.idr) return;
 
-    if (value === '' || value.endsWith('.')) {
+    const value = activeInput === 'ton' ? tonAmount : idrAmount.replace(/[^0-9]/g, '');
+
+    if (value === '' || (activeInput === 'ton' && value.endsWith('.'))) {
         if(activeInput === 'ton') setIdrAmount('');
         else setTonAmount('');
         return;
@@ -197,7 +187,7 @@ export function DazaiConverter({
       const newTonAmount = harga_jual_per_ton > 0 ? inputAmount / harga_jual_per_ton : 0;
       setTonAmount(newTonAmount.toFixed(8).replace(/\.?0+$/, "") || "0");
     }
-  }, [tonAmount, idrAmount, activeInput, tonPrice.idr, settings.profitMode, settings.profitValue, settingsLoaded]);
+  }, [tonAmount, idrAmount, activeInput, tonPrice.idr, settings.profitMode, settings.profitValue, settingsLoaded, lang]);
 
 
   const handleReset = () => {
@@ -207,7 +197,6 @@ export function DazaiConverter({
 
   const handleSwap = () => {
     setActiveInput(prev => (prev === 'ton' ? 'idr' : 'ton'));
-    // Resetting amounts on swap
     setTonAmount('');
     setIdrAmount('');
   };
@@ -331,5 +320,3 @@ export function DazaiConverter({
     </>
   );
 }
-
-    
