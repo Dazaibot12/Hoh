@@ -202,13 +202,7 @@ export function ConverterDisplay({
     );
   }
 
-  const idrValue = parseInt(idrAmount.replace(/[^0-9]/g, ''), 10);
-  const displayAmount =
-    activeInput === 'ton'
-      ? tonAmount
-      : isNaN(idrValue)
-      ? ''
-      : idrValue.toLocaleString(lang === 'id' ? 'id-ID' : 'en-US');
+  const displayAmount = activeInput === 'ton' ? tonAmount : idrAmount;
 
   const profitSettingString =
     settings.profitMode === 'percentage'
