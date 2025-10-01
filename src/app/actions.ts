@@ -1,6 +1,7 @@
 'use server';
 
-import type { TonPrice, PriceHistoryData } from '@/lib/definitions';
+// Perbaikan 1: Impor ChartPoint secara eksplisit
+import type { TonPrice, PriceHistoryData, ChartPoint } from '@/lib/definitions'; 
 import { conversionFormatRecommendation } from '@/ai/flows/conversion-format-recommendation';
 import type { Language } from '@/hooks/use-language';
 import { z } from 'zod';
@@ -98,7 +99,8 @@ async function fetchAndProcessHistory(
     let chartPoints = prices;
     if (prices.length > points) {
        const every = Math.ceil(prices.length / points);
-       chartPoints = prices.filter((_e: number, i: number) => i % every === 0);
+       // Perbaikan 2: Terapkan anotasi tipe eksplisit
+       chartPoints = prices.filter((_e: ChartPoint, i) => i % every === 0); 
     }
     
     return {
@@ -185,7 +187,8 @@ export async function fetchTonPriceHistoryHourly(lang: Language = 'en'): Promise
     let chartPoints = prices;
     if (prices.length > points) {
        const every = Math.ceil(prices.length / points);
-       chartPoints = prices.filter((_e, i) => i % every === 0);
+       // Perbaikan 3: Terapkan anotasi tipe eksplisit
+       chartPoints = prices.filter((_e: ChartPoint, i) => i % every === 0); 
     }
 
     let changePercent = 0;
