@@ -81,7 +81,8 @@ async function fetchAndProcessHistory(
       throw new Error(`Coingecko API error: ${response.statusText}`);
     }
     const data = await response.json();
-    const prices = data.prices.map(([timestamp, price]: [number, number]) => ({
+    // Tambahkan anotasi tipe eksplisit untuk array prices
+    const prices: ChartPoint[] = data.prices.map(([timestamp, price]: [number, number]) => ({
       time: timeFormatter(new Date(timestamp)),
       price: price,
     }));
@@ -96,11 +97,11 @@ async function fetchAndProcessHistory(
     }
 
     // Return every Nth item to reduce the number of points on the chart for clarity
-    let chartPoints = prices;
+    let chartPoints: ChartPoint[] = prices;
     if (prices.length > points) {
        const every = Math.ceil(prices.length / points);
-       // FIXED: Explicitly type '_e' and 'i' (which is the index). '_e' is of type ChartPoint.
-       chartPoints = prices.filter((_e: ChartPoint, i: number) => i % every === 0); 
+       // FIXED: Ganti _e dengan _ dan pertahankan tipe number pada index i.
+       chartPoints = prices.filter((_, i: number) => i % every === 0); 
     }
     
     return {
@@ -175,7 +176,7 @@ export async function fetchTonPriceHistoryHourly(lang: Language = 'en'): Promise
       timeZone,
     });
 
-    const prices = data.prices
+    const prices: ChartPoint[] = data.prices
       .filter(([timestamp]: [number, number]) => timestamp >= oneHourAgo)
       .map(([timestamp, price]: [number, number]) => ({
         time: timeFormat.format(new Date(timestamp)),
@@ -184,11 +185,11 @@ export async function fetchTonPriceHistoryHourly(lang: Language = 'en'): Promise
 
     // Ensure we don't have too many points
     const points = 12; // a point every 5 mins
-    let chartPoints = prices;
+    let chartPoints: ChartPoint[] = prices;
     if (prices.length > points) {
        const every = Math.ceil(prices.length / points);
-       // FIXED: Explicitly type '_e' and 'i' (which is the index). '_e' is of type ChartPoint.
-       chartPoints = prices.filter((_e: ChartPoint, i: number) => i % every === 0); 
+       // FIXED: Ganti _e dengan _ dan pertahankan tipe number pada index i.
+       chartPoints = prices.filter((_: ChartPoint, i: number) => i % every === 0); 
     }
 
     let changePercent = 0;
