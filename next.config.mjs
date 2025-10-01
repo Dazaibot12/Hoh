@@ -1,8 +1,7 @@
-import type {NextConfig} from 'next';
-
-const nextConfig: NextConfig = {
+const nextConfig = {
   /* config options here */
   typescript: {
+    // Mempertahankan ini untuk mengabaikan error build TypeScript, seperti yang Anda inginkan
     ignoreBuildErrors: true,
   },
   eslint: {
