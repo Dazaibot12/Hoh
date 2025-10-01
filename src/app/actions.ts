@@ -98,7 +98,7 @@ async function fetchAndProcessHistory(
     let chartPoints = prices;
     if (prices.length > points) {
        const every = Math.ceil(prices.length / points);
-       chartPoints = prices.filter((_e, i) => i % every === 0);
+       chartPoints = prices.filter((_e: number, i: number) => i % every === 0);
     }
     
     return {
