@@ -99,8 +99,8 @@ async function fetchAndProcessHistory(
     let chartPoints = prices;
     if (prices.length > points) {
        const every = Math.ceil(prices.length / points);
-       // Perbaikan 2: Terapkan anotasi tipe eksplisit
-       chartPoints = prices.filter((_e: ChartPoint, i) => i % every === 0); 
+       // FIXED: Explicitly type '_e' and 'i' (which is the index). '_e' is of type ChartPoint.
+       chartPoints = prices.filter((_e: ChartPoint, i: number) => i % every === 0); 
     }
     
     return {
@@ -187,8 +187,8 @@ export async function fetchTonPriceHistoryHourly(lang: Language = 'en'): Promise
     let chartPoints = prices;
     if (prices.length > points) {
        const every = Math.ceil(prices.length / points);
-       // Perbaikan 3: Terapkan anotasi tipe eksplisit
-       chartPoints = prices.filter((_e: ChartPoint, i) => i % every === 0); 
+       // FIXED: Explicitly type '_e' and 'i' (which is the index). '_e' is of type ChartPoint.
+       chartPoints = prices.filter((_e: ChartPoint, i: number) => i % every === 0); 
     }
 
     let changePercent = 0;
